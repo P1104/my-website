@@ -197,8 +197,8 @@ export const HeroSectionTwo: React.FC = () => {
             key={i}
             className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
             initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+              x: Math.random() * 1200,
+              y: Math.random() * 800,
             }}
             animate={{
               y: [null, -100],
