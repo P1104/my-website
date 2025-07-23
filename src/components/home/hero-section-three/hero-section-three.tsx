@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Stars } from "@react-three/drei";
 
 // Stars Background Component
 type StarLayerProps = {
@@ -138,6 +140,23 @@ function StarsBackground({
   );
 }
 
+// 3D Animation Highlight
+const Animated3DHighlight = () => (
+  <div className="w-full h-full min-h-[260px] md:min-h-[340px]">
+    <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      {/* Spinning Torus Knot (symbolizes innovation, AI, and data) */}
+      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
+        <torusKnotGeometry args={[1, 0.3, 128, 32]} />
+        <meshStandardMaterial color="#6366f1" emissive="#3b82f6" metalness={0.7} roughness={0.2} />
+      </mesh>
+      <Stars radius={10} depth={50} count={2000} factor={0.5} saturation={0} fade speed={1} />
+      <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.5} />
+    </Canvas>
+  </div>
+);
+
 // Main Hero Component
 interface HeroSectionProps {
   brandName?: string;
@@ -216,7 +235,6 @@ export const HeroSectionThree: React.FC<HeroSectionProps> = ({
           <p className="text-lg md:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed mb-8">
             {description}
           </p>
-          
           {/* Services */}
           <div className="flex flex-wrap justify-center gap-4 mb-12">
             {services.map((service, index) => (
@@ -247,6 +265,13 @@ export const HeroSectionThree: React.FC<HeroSectionProps> = ({
             Innovation, experience, and commitment combined to deliver transformation across industries.
           </p>
         </motion.div>
+
+        {/* 3D Animation Highlight */}
+        <div className="flex justify-center mb-16">
+          <div className="relative w-[320px] h-[320px] md:w-[400px] md:h-[400px] rounded-2xl overflow-hidden shadow-lg bg-white/80">
+            <Animated3DHighlight />
+          </div>
+        </div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
