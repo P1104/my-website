@@ -6,6 +6,8 @@ import type { Container} from "@tsparticles/engine";
 import { loadSlim } from "@tsparticles/slim";
 import { motion, useAnimation } from "framer-motion";
 import { Shield, Zap, BarChart3, HeadphonesIcon, Lock, Brain } from 'lucide-react';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stars } from '@react-three/drei';
 
 function cn(...classes: (string | undefined | null | boolean)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -183,13 +185,28 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, del
   );
 };
 
+// 3D Effect Component
+const Advanced3DEffect = () => (
+  <div className="w-full h-full min-h-[280px] md:min-h-[350px]">
+    <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
+        <torusKnotGeometry args={[1, 0.3, 128, 32]} />
+        <meshStandardMaterial color="#6366f1" emissive="#3b82f6" metalness={0.7} roughness={0.2} />
+      </mesh>
+      <Stars radius={10} depth={50} count={2000} factor={0.5} saturation={0} fade speed={1} />
+      <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={1.5} />
+    </Canvas>
+  </div>
+);
+
 export const HeroSectionTwo: React.FC = () => {
   return (
     <div className="relative  bg-white overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100/20 via-transparent to-transparent"></div>
       <div className="absolute inset-0 bg-grid-gray-900/[0.02] bg-[size:50px_50px]"></div>
-      
       {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(20)].map((_, i) => (
@@ -212,7 +229,6 @@ export const HeroSectionTwo: React.FC = () => {
           />
         ))}
       </div>
-
       {/* Stars Background */}
       <div className="absolute inset-0 z-0">
         <SparklesCore
@@ -225,7 +241,6 @@ export const HeroSectionTwo: React.FC = () => {
           speed={0.5}
         />
       </div>
-
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-16">
         {/* Philosophy Section */}
@@ -235,16 +250,6 @@ export const HeroSectionTwo: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          {/* <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-blue-100 border border-blue-200 rounded-full px-4 py-2 mb-6"
-          >
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span className="text-blue-700 text-sm font-medium">Our Principles</span>
-          </motion.div> */}
-
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -263,7 +268,6 @@ export const HeroSectionTwo: React.FC = () => {
               </motion.span>
             ))}
           </motion.h1>
-          
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -274,7 +278,13 @@ export const HeroSectionTwo: React.FC = () => {
             Built for scale, security, and intelligence.
           </motion.p>
         </motion.div>
-
+        {/* 3D Effect Section */}
+        <div className="flex justify-center mb-16">
+          <div className="relative w-[320px] h-[320px] md:w-[400px] md:h-[400px] rounded-2xl overflow-hidden shadow-lg bg-white/80">
+            <Advanced3DEffect />
+            {/* Optional: Overlay neural network or glow effects here */}
+          </div>
+        </div>
         {/* Core Values Grid */}
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           <FeatureCard
@@ -296,7 +306,6 @@ export const HeroSectionTwo: React.FC = () => {
             delay={0.6}
           />
         </div>
-
         {/* Powerful Features Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -311,8 +320,7 @@ export const HeroSectionTwo: React.FC = () => {
             Our products are guaranteed to help in increasing productivity regardless of the domain
           </p>
         </motion.div>
-
-        {/* Features Bento Grid */}
+        {/* Features Bento Grid - with video card replacing analytics */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -334,7 +342,6 @@ export const HeroSectionTwo: React.FC = () => {
               </div>
             </div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -347,20 +354,33 @@ export const HeroSectionTwo: React.FC = () => {
               Smart algorithms work behind the scenes to optimize your experience and deliver intelligent insights.
             </p>
           </motion.div>
-
+          {/* Video Card replacing Real-time Analytics */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 1.4 }}
-            className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:bg-white transition-all duration-300 shadow-sm"
+            className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:bg-white transition-all duration-300 shadow-sm flex flex-col"
           >
-            <BarChart3 className="w-8 h-8 text-blue-600 mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Real-time Analytics</h3>
-            <p className="text-gray-600 text-sm">
-              Get instant access to comprehensive data visualizations and performance metrics.
+            <div className="flex items-center mb-4">
+              <Brain className="w-8 h-8 text-blue-600 mr-3" />
+              <h3 className="text-xl font-bold text-gray-900 mb-3">AI in Action</h3>
+            </div>
+            <p className="text-gray-600 text-sm mb-4">
+              Watch how AI is transforming the world in real time.
             </p>
+            <div className="rounded-lg overflow-hidden aspect-video border border-blue-200 shadow flex-1">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/2ePf9rue1Ao"
+                title="AI Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-48 md:h-56"
+              ></iframe>
+            </div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
