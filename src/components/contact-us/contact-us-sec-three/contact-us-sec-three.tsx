@@ -1,10 +1,10 @@
 "use client";
 
-import React,{useRef,useState,useCallback,useEffect} from 'react';
-import { motion } from "framer-motion";
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { motion, Variants } from "framer-motion";
 import { Mail, Phone, MapPin, ArrowRight } from "lucide-react";
 import createGlobe, { COBEOptions } from "cobe";
-import { Sparkles } from '@/components/ui/sparkles';
+import { Sparkles } from "@/components/ui/sparkles";
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -152,7 +152,7 @@ export const ContactSecThree = () => {
     },
   ];
 
-  const fadeInUp = {
+  const fadeInUp: Variants = {
     hidden: { opacity: 0, y: 60 },
     visible: {
       opacity: 1,
@@ -164,7 +164,7 @@ export const ContactSecThree = () => {
     },
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50 },
     visible: (i: number) => ({
       opacity: 1,
@@ -173,15 +173,15 @@ export const ContactSecThree = () => {
         delay: 0.3 + i * 0.1,
         duration: 0.6,
         ease: [0.23, 0.86, 0.39, 0.96],
-      }
+      },
     }),
     hover: {
       y: -5,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
-      }
-    }
+        ease: "easeOut",
+      },
+    },
   };
 
   const staggerContainer = {
@@ -196,28 +196,24 @@ export const ContactSecThree = () => {
   };
 
   return (
-    <section className="relative pb-12 px-4 bg-white overflow-hidden">
-            <Sparkles
-          background="transparent"
-          minSize={0.6}
-          maxSize={1.4}
-          particleDensity={80}
-          particleColor="#3b82f6"
-          speed={0.8}
-          className="opacity-80"
-        />
+    <section className="relative pb-12 px-4  overflow-hidden pt-4">
+      <Sparkles
+        background="transparent"
+        minSize={0.6}
+        maxSize={1.4}
+        particleDensity={80}
+        particleColor="#3b82f6"
+        speed={0.8}
+        className="opacity-80"
+      />
       <div className="max-w-7xl mx-auto">
-        <motion.div 
+        <motion.div
           className="space-y-8"
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.div 
-            variants={fadeInUp}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div variants={fadeInUp} initial="hidden" animate="visible">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
               Other ways to reach us
             </h3>
@@ -239,9 +235,7 @@ export const ContactSecThree = () => {
                 whileHover="hover"
               >
                 <div className="flex items-center gap-4 relative z-10">
-                  <motion.div
-                    className="w-14 h-14 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center"
-                  >
+                  <motion.div className="w-14 h-14 rounded-xl bg-blue-100 border border-blue-200 flex items-center justify-center">
                     <method.icon className="w-7 h-7 text-blue-500" />
                   </motion.div>
                   <div className="flex-1">
@@ -254,7 +248,7 @@ export const ContactSecThree = () => {
                     <p className="text-gray-900 font-medium">{method.value}</p>
                     <div className="mt-2 flex gap-2">
                       {method.features.map((feature, i) => (
-                        <span 
+                        <span
                           key={i}
                           className="text-xs bg-gray-200 px-2 py-1 rounded-full text-gray-600"
                         >

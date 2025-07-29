@@ -1,9 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from "framer-motion";
-import { User, Mail, Building, MessageSquare, Send, ArrowRight, CheckCircle } from "lucide-react";
-import { Sparkles } from '@/components/ui/sparkles';
+import React, { useState } from "react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import {
+  User,
+  Mail,
+  Building,
+  MessageSquare,
+  Send,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
+import { Sparkles } from "@/components/ui/sparkles";
+
 
 export const ContactSecTwo = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +25,7 @@ export const ContactSecTwo = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const fadeInUp = {
+  const fadeInUp:Variants = {
     hidden: { opacity: 0, y: 60 },
     visible: {
       opacity: 1,
@@ -63,7 +72,7 @@ export const ContactSecTwo = () => {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsSubmitted(true);
@@ -73,8 +82,8 @@ export const ContactSecTwo = () => {
   };
 
   return (
-    <section className="pb-20 px-4 relative z-10 overflow-hidden bg-white">
-         <Sparkles
+    <section className="pb-20 px-4 relative z-10 overflow-hidden pt-4">
+      <Sparkles
         background="transparent"
         minSize={0.3}
         maxSize={1}
@@ -103,7 +112,8 @@ export const ContactSecTwo = () => {
               Send us a message
             </h2>
             <p className="text-gray-600 text-lg">
-              Tell us about your project and we will get back to you within 24 hours.
+              Tell us about your project and we will get back to you within 24
+              hours.
             </p>
           </motion.div>
 
@@ -135,9 +145,7 @@ export const ContactSecTwo = () => {
                           handleInputChange("name", e.target.value)
                         }
                         className={`w-full pl-10 pr-4 py-4 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-all ${
-                          errors.name
-                            ? "border-red-400"
-                            : "border-gray-200"
+                          errors.name ? "border-red-400" : "border-gray-200"
                         }`}
                       />
                       {errors.name && (
@@ -169,9 +177,7 @@ export const ContactSecTwo = () => {
                           handleInputChange("email", e.target.value)
                         }
                         className={`w-full pl-10 pr-4 py-4 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-all ${
-                          errors.email
-                            ? "border-red-400"
-                            : "border-gray-200"
+                          errors.email ? "border-red-400" : "border-gray-200"
                         }`}
                       />
                       {errors.email && (
@@ -225,9 +231,7 @@ export const ContactSecTwo = () => {
                         handleInputChange("message", e.target.value)
                       }
                       className={`w-full pl-10 pr-4 py-4 bg-gray-50 border rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-all resize-none ${
-                        errors.message
-                          ? "border-red-400"
-                          : "border-gray-200"
+                        errors.message ? "border-red-400" : "border-gray-200"
                       }`}
                     />
                     {errors.message && (
@@ -293,7 +297,8 @@ export const ContactSecTwo = () => {
                   Message Sent!
                 </h3>
                 <p className="text-gray-600 text-lg mb-6">
-                  Thank you for reaching out. We will get back to you within 24 hours.
+                  Thank you for reaching out. We will get back to you within 24
+                  hours.
                 </p>
                 <motion.button
                   onClick={() => {

@@ -2,13 +2,18 @@
 import { HeroSectionOne } from "./hero-section-one/hero-section-one";
 import { HeroSectionThree } from "./hero-section-three/hero-section-three";
 import { HeroSectionTwo } from "./hero-section-two/hero-section-two";
+import { HeroSectionThemeWrapper } from "./hero-section-theme-wrapper/HeroSectionThemeWrapper";
+import {HeroSectionFour} from "./hero-section-four/hero-section-four";
 
 export function HomePage() {
   return (
-    <div>
-      <HeroSectionOne />
-      <HeroSectionTwo />
-      <HeroSectionThree />
-    </div>
+    <HeroSectionThemeWrapper>
+      <div className="relative z-10">
+        <HeroSectionOne />
+        <HeroSectionTwo />
+        <HeroSectionFour />
+        <HeroSectionThree />
+      </div>
+    </HeroSectionThemeWrapper>
   );
 }

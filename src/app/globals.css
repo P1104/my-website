@@ -11,6 +11,69 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+.theme-custom {
+  --gradient: #003950;
+  --radius: 0.5rem;
+  --background: oklch(0.97 0.004 220);
+  --foreground: oklch(0.1 0.005 220);
+  --card: oklch(0.94 0.01 220);
+  --card-foreground: oklch(0.1 0.005 220);
+  --popover: oklch(0.94 0.01 220);
+  --popover-foreground: oklch(0.1 0.005 220);
+  --primary: oklch(0.55 0.17 200);
+  --primary-foreground: oklch(0.98 0.003 220);
+  --secondary: oklch(0.96 0.01 220);
+  --secondary-foreground: oklch(0.18 0.02 220);
+  --muted: oklch(0.96 0.01 220);
+  --muted-foreground: oklch(0.45 0.02 220);
+  --accent: oklch(0.65 0.12 190);
+  --accent-foreground: oklch(0.98 0.003 220);
+  --destructive: oklch(0.65 0.18 27);
+  --destructive-foreground: oklch(0.98 0.003 220);
+  --border: oklch(0.9 0.01 220);
+  --input: oklch(0.9 0.01 220);
+  --ring: oklch(0.55 0.17 200);
+  --chart-1: oklch(0.55 0.17 200);
+  --chart-2: oklch(0.6 0.14 170);
+  --chart-3: oklch(0.5 0.2 190);
+  --chart-4: oklch(0.65 0.13 210);
+  --chart-5: oklch(0.45 0.15 180);
+  --sidebar: oklch(0.94 0.01 220);
+  --sidebar-foreground: oklch(0.1 0.005 220);
+  --sidebar-primary: oklch(0.55 0.17 200);
+  --sidebar-primary-foreground: oklch(0.98 0.003 220);
+  --sidebar-accent: oklch(0.65 0.12 190);
+  --sidebar-accent-foreground: oklch(0.98 0.003 220);
+  --sidebar-border: oklch(0.9 0.01 220);
+  --sidebar-ring: oklch(0.55 0.17 200);
+}
+
+/* Custom styling for expandable chat close button */
+.theme-custom button[aria-label*="close"],
+.theme-custom button[aria-label*="Close"],
+.theme-custom [data-state="open"] button:has(svg[stroke-width="2"]),
+.theme-custom button:has(svg[data-lucide="x"]),
+.theme-custom button:has(svg[class*="lucide-x"]) {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border: none !important;
+}
+
+.theme-custom button[aria-label*="close"]:hover,
+.theme-custom button[aria-label*="Close"]:hover,
+.theme-custom [data-state="open"] button:has(svg[stroke-width="2"]):hover,
+.theme-custom button:has(svg[data-lucide="x"]):hover,
+.theme-custom button:has(svg[class*="lucide-x"]):hover {
+  background-color: var(--primary) !important;
+  opacity: 0.9 !important;
+  color: var(--primary-foreground) !important;
+}
+
+/* More specific targeting for the close button icon */
+.theme-custom button svg[stroke-width="2"] {
+  color: var(--primary-foreground) !important;
+  stroke: var(--primary-foreground) !important;
+}
 
 @media (prefers-color-scheme: dark) {
   :root {

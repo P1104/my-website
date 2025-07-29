@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { motion,Variants } from "framer-motion";
 
 // Stars Background Component
 function StarsBackground() {
@@ -84,14 +83,14 @@ function StarsBackground() {
 }
 
 export const ContactSecOne = () => {
-  const fadeInUp = {
+  const fadeInUp:Variants = {
     hidden: { opacity: 0, y: 60 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: { 
         duration: 0.8, 
-        ease: [0.23, 0.86, 0.39, 0.96] 
+        ease: "easeInOut" 
       }
     }
   };
@@ -108,7 +107,7 @@ export const ContactSecOne = () => {
   };
 
   return (
-    <div className="relative bg-white text-gray-900 overflow-hidden">
+    <div className="relative text-gray-900 overflow-hidden">
       <StarsBackground />
       
       <section className="relative z-10 py-24 px-4 text-center overflow-hidden">
@@ -118,24 +117,6 @@ export const ContactSecOne = () => {
           initial="hidden"
           animate="visible"
         >
-          {/* <motion.div variants={fadeInUp}>
-            <motion.div
-              className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gray-100 border border-gray-200 backdrop-blur-sm mb-6"
-              whileHover={{ scale: 1.05, borderColor: "hsl(221, 83%, 53%)" }}
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <Sparkles className="h-4 w-4 text-blue-500" />
-              </motion.div>
-              <span className="text-sm font-medium text-gray-600">
-                Let&apos;s Connect
-              </span>
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            </motion.div>
-          </motion.div> */}
-
           <motion.h1 
             className="text-4xl sm:text-6xl md:text-7xl font-bold mb-8 tracking-tight text-gray-900"
             variants={fadeInUp}
@@ -148,13 +129,13 @@ export const ContactSecOne = () => {
           </motion.h1>
           
           <motion.p 
-            className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8"
+            className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
             variants={fadeInUp}
           >
             Ready to transform your business? Let us start a conversation about your goals and how we can help you achieve them.
           </motion.p>
         </motion.div>
       </section>
-    </div>
+    </div>  
   );
 };
