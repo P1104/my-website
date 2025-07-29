@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Mail, Github, Linkedin } from "lucide-react";
 import { Sparkles } from '@/components/ui/sparkles';
 
+
 export const ContactSecFour = () => {
   const handleClick = (e: React.MouseEvent, href: string) => {
     if (href.startsWith('mailto:')) {
@@ -22,6 +23,7 @@ export const ContactSecFour = () => {
   }) => (
     <a
       href={href}
+      title='hi'
       target={href.startsWith('mailto:') ? '_self' : '_blank'}
       rel="noopener noreferrer"
       onClick={(e) => handleClick(e, href)}
@@ -32,7 +34,8 @@ export const ContactSecFour = () => {
   );
 
   return (
-    <section className="py-12 bg-white relative z-10">
+
+        <section className="py-12  relative z-10 pt-4 ">
        <Sparkles
           background="transparent"
           minSize={0.6}
@@ -74,5 +77,7 @@ export const ContactSecFour = () => {
         </motion.div>
       </div>
     </section>
+
+  
   );
 };
