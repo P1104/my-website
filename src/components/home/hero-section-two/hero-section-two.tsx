@@ -1,390 +1,594 @@
 "use client";
 
-import React, { useId, useEffect, useState } from "react";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container} from "@tsparticles/engine";
-import { loadSlim } from "@tsparticles/slim";
-import { motion, useAnimation } from "framer-motion";
-import { Shield, Zap, BarChart3, HeadphonesIcon, Lock, Brain } from 'lucide-react';
+import React, { useRef, useState } from "react";
+import { motion, useInView, Variants } from "framer-motion";
+import { Brain, Zap, Shield, HeadphonesIcon, Lock, LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Spline from '@splinetool/react-spline';
 
-function cn(...classes: (string | undefined | null | boolean)[]): string {
-  return classes.filter(Boolean).join(" ");
+type FeatureType = {
+  title: string;
+  icon: LucideIcon | React.FC<{ className?: string }>;
+  description: string;
+};
+
+function GridPattern({
+  width,
+  height,
+  x,
+  y,
+  squares,
+  ...props
+}: React.ComponentProps<"svg"> & {
+  width: number;
+  height: number;
+  x: string;
+  y: string;
+  squares?: number[][];
+}) {
+  const patternId = React.useId();
+
+  return (
+    <svg aria-hidden="true" {...props}>
+      <defs>
+        <pattern
+          id={patternId}
+          width={width}
+          height={height}
+          patternUnits="userSpaceOnUse"
+          x={x}
+          y={y}
+        >
+          <path
+            d={`M.5 ${height}V.5H${width}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            className="text-gray-600/80"
+          />
+        </pattern>
+      </defs>
+      <rect
+        width="100%"
+        height="100%"
+        strokeWidth={0}
+        fill={`url(#${patternId})`}
+      />
+      {squares && (
+        <svg x={x} y={y} className="overflow-visible">
+          {squares.map(([x, y], index) => (
+            <rect
+              strokeWidth="0"
+              key={index}
+              width={width + 1}
+              height={height + 1}
+              x={x * width}
+              y={y * height}
+              fill="currentColor"
+              className="text-blue-600/40"
+            />
+          ))}
+        </svg>
+      )}
+    </svg>
+  );
 }
 
-type ParticlesProps = {
-  id?: string;
-  className?: string;
-  background?: string;
-  particleSize?: number;
-  minSize?: number;
-  maxSize?: number;
-  speed?: number;
-  particleColor?: string;
-  particleDensity?: number;
-};
-
-export const SparklesCore = (props: ParticlesProps) => {
-  const {
-    id,
-    className,
-    background,
-    minSize,
-    maxSize,
-    speed,
-    particleColor,
-    particleDensity,
-  } = props;
-  const [init, setInit] = useState(false);
-  
-  useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
-  
-  const controls = useAnimation();
-
-  const particlesLoaded = async (container?: Container) => {
-    if (container) {
-      controls.start({
-        opacity: 1,
-        transition: {
-          duration: 1,
-        },
-      });
-    }
-  };
-
-  const generatedId = useId();
-  
-  return (
-    <motion.div animate={controls} className={cn("opacity-0", className)}>
-      {init && (
-        <Particles
-          id={id || generatedId}
-          className={cn("h-full w-full")}
-          particlesLoaded={particlesLoaded}
-          options={{
-            background: {
-              color: {
-                value: background || "transparent",
-              },
-            },
-            fullScreen: {
-              enable: false,
-              zIndex: 1,
-            },
-            fpsLimit: 120,
-            interactivity: {
-              events: {
-                onClick: {
-                  enable: true,
-                  mode: "push",
-                },
-                onHover: {
-                  enable: false,
-                  mode: "repulse",
-                },
-                resize: true,
-              },
-              modes: {
-                push: {
-                  quantity: 4,
-                },
-                repulse: {
-                  distance: 200,
-                  duration: 0.4,
-                },
-              },
-            },
-            particles: {
-              bounce: {
-                horizontal: {
-                  value: 1,
-                },
-                vertical: {
-                  value: 1,
-                },
-              },
-              collisions: {
-                enable: false,
-              },
-              color: {
-                value: particleColor || "#3b82f6",
-              },
-              move: {
-                enable: true,
-                speed: {
-                  min: 0.1,
-                  max: 1,
-                },
-              },
-              number: {
-                density: {
-                  enable: true,
-                  width: 400,
-                  height: 400,
-                },
-                value: particleDensity || 80,
-              },
-              opacity: {
-                value: {
-                  min: 0.1,
-                  max: 0.5,
-                },
-                animation: {
-                  enable: true,
-                  speed: speed || 4,
-                },
-              },
-              shape: {
-                type: "circle",
-              },
-              size: {
-                value: {
-                  min: minSize || 0.4,
-                  max: maxSize || 1.2,
-                },
-              },
-            },
-            detectRetina: true,
-          }}
-        />
-      )}
-    </motion.div>
-  );
-};
+function genRandomPattern(length?: number): number[][] {
+  length = length ?? 5;
+  return Array.from({ length }, () => [
+    Math.floor(Math.random() * 4) + 7, // random x between 7 and 10
+    Math.floor(Math.random() * 6) + 1, // random y between 1 and 6
+  ]);
+}
 
 interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  delay?: number;
+  feature: FeatureType;
+  className?: string;
+  index: number;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, delay = 0 }) => {
+function FeatureCard({
+  feature,
+  className,
+  index,
+  ...props
+}: FeatureCardProps & Omit<React.ComponentProps<"div">, keyof FeatureCardProps | 'onAnimationStart' | 'onAnimationEnd' | 'onAnimationIteration' | 'onDrag' | 'onDragStart' | 'onDragEnd'>) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const p = genRandomPattern();
+
+  // Advanced reveal animation
+  const cardVariants: Variants = {
+    hidden: {
+      opacity: 0,
+      y: 60,
+      rotateX: -15,
+      scale: 0.9,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        delay: index * 0.15,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+  };
+
+  const contentVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        delay: index * 0.15 + 0.3,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const iconVariants: Variants = {
+    hidden: { scale: 0, rotate: -180 },
+    visible: {
+      scale: 1,
+      rotate: 0,
+      transition: {
+        type: "spring",
+        stiffness: 200,
+        damping: 15,
+        delay: index * 0.15 + 0.5,
+      },
+    },
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay }}
-      className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl p-6 hover:bg-white transition-all duration-300 shadow-sm"
+      ref={ref}
+      className={cn("relative overflow-hidden p-8 perspective-1000", className)}
+      variants={cardVariants}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      whileHover={{
+        y: -12,
+        rotateY: 5,
+        scale: 1.02,
+        transition: { duration: 0.3, ease: "easeOut" },
+      }}
+      whileTap={{ scale: 0.98 }}
+      {...props}
     >
-      <div className="flex items-center mb-4">
-        <div className="p-2 bg-blue-100 rounded-lg mr-3">
-          {icon}
+      {/* Animated background pattern */}
+      <motion.div
+        className="pointer-events-none absolute top-0 left-1/2 -mt-2 -ml-20 h-full w-full [mask-image:linear-gradient(white,transparent)] opacity-60"
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 0.6 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: index * 0.15 + 0.2 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/15 to-gray-900/5 [mask-image:radial-gradient(farthest-side_at_top,white,transparent)]">
+          <GridPattern
+            width={20}
+            height={20}
+            x="-12"
+            y="4"
+            squares={p}
+            className="absolute inset-0 h-full w-full mix-blend-overlay"
+          />
         </div>
-        <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-      </div>
-      <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
+      </motion.div>
+
+      {/* Glowing border effect */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0"
+        whileHover={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      />
+
+      <motion.div className="relative z-10" variants={contentVariants}>
+        <motion.div
+          className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600 drop-shadow-lg"
+          variants={iconVariants}
+          whileHover={{
+            scale: 1.1,
+            rotate: 5,
+            backgroundColor: "#dbeafe",
+            transition: { duration: 0.2 },
+          }}
+        >
+          <feature.icon className="h-6 w-6" strokeWidth={1} />
+        </motion.div>
+
+        <motion.h3
+          className="text-xl font-bold text-gray-900 mb-4"
+          initial={{ opacity: 0, x: -20 }}
+          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+          transition={{ duration: 0.6, delay: index * 0.15 + 0.7 }}
+        >
+          {feature.title}
+        </motion.h3>
+
+        <motion.p
+          className="text-gray-600 leading-relaxed text-sm"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8, delay: index * 0.15 + 0.9 }}
+        >
+          {feature.description}
+        </motion.p>
+      </motion.div>
     </motion.div>
   );
-};
+}
 
 export const HeroSectionTwo: React.FC = () => {
+  const [isSplineLoaded, setIsSplineLoaded] = useState(false);
+
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const wordVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1 + 0.3,
+        duration: 0.5,
+      },
+    }),
+  };
+
+  // Custom Play Icon Component
+  const PlayIcon: React.FC<{ className?: string }> = ({ className }) => (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <rect
+        x="3"
+        y="5"
+        width="18"
+        height="14"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      <polygon points="10,9 16,12 10,15" fill="currentColor" />
+    </svg>
+  );
+
   return (
-    <div className="relative  bg-white overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100/20 via-transparent to-transparent"></div>
-      <div className="absolute inset-0 bg-grid-gray-900/[0.02] bg-[size:50px_50px]"></div>
-      
-      {/* Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+    <div className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 overflow-hidden">
+      {/* Animated background elements */}
+      <motion.div
+        className="absolute inset-0 opacity-30"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.3 }}
+        transition={{ duration: 2 }}
+      >
+        {Array.from({ length: 20 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
+            className="absolute w-2 h-2 bg-blue-400 rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
             }}
             animate={{
-              y: [null, -100],
-              opacity: [0, 1, 0],
+              y: [0, -20, 0],
+              opacity: [0.3, 0.7, 0.3],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: 3 + Math.random() * 2,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: Math.random() * 2,
             }}
           />
         ))}
-      </div>
+      </motion.div>
 
-      {/* Stars Background */}
-      <div className="absolute inset-0 z-0">
-        <SparklesCore
-          background="transparent"
-          minSize={0.4}
-          maxSize={1.2}
-          particleDensity={80}
-          className="w-full h-full"
-          particleColor="#3b82f6"
-          speed={0.5}
-        />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-16">
-        {/* Philosophy Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          {/* <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-blue-100 border border-blue-200 rounded-full px-4 py-2 mb-6"
+      <motion.div
+        className="relative z-10 container mx-auto px-4 py-8"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
+          <motion.div
+            className="text-center md:text-left"
+            variants={containerVariants}
           >
-            <Sparkles className="w-4 h-4 text-blue-600" />
-            <span className="text-blue-700 text-sm font-medium">Our Principles</span>
-          </motion.div> */}
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight"
-          >
-            {["Our", "Philosophy"].map((word, index) => (
-              <motion.span
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                className={index === 0 ? "bg-clip-text text-black" : ""}
+            <motion.div
+              className="inline-flex items-center gap-2 bg-blue-100 border border-blue-200 rounded-full px-4 py-2 mb-6"
+              variants={itemVariants}
+              whileHover={{
+                scale: 1.05,
+                backgroundColor: "#dbeafe",
+                borderColor: "#93c5fd",
+                transition: { duration: 0.2 },
+              }}
+            >
+              <motion.div
+                animate={{
+                  rotate: 360,
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{
+                  rotate: { duration: 4, repeat: Infinity, ease: "linear" },
+                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                }}
+                className="w-4 h-4 text-blue-600"
               >
-                {word}{' '}
-              </motion.span>
-            ))}
-          </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
-          >
-            Discover the cutting-edge capabilities that make our platform the perfect choice for modern businesses. 
-            Built for scale, security, and intelligence.
-          </motion.p>
-        </motion.div>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 2L14.5 9H22L16 13.5L18.5 20.5L12 16L5.5 20.5L8 13.5L2 9H9.5L12 2Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </motion.div>
+              <span className="text-blue-700 text-sm font-medium">
+                Our Principles
+              </span>
+            </motion.div>
 
-        {/* Core Values Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-20">
-          <FeatureCard
-            icon={<Zap className="w-6 h-6 text-blue-600" />}
-            title="Simplicity"
-            description="All our products are designed to be simple and easy to use."
-            delay={0.2}
-          />
-          <FeatureCard
-            icon={<Shield className="w-6 h-6 text-blue-600" />}
-            title="Security"
-            description="We want our users to be the only ones seeing their data."
-            delay={0.4}
-          />
-          <FeatureCard
-            icon={<Zap className="w-6 h-6 text-blue-600" />}
-            title="Speed"
-            description="Nobody likes to see the buffering animation on their screen."
-            delay={0.6}
-          />
+            <motion.h1
+              className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight"
+              variants={itemVariants}
+            >
+              {["Our", "Philosophy"].map((word, index) => (
+                <motion.span
+                  key={index}
+                  custom={index}
+                  variants={wordVariants}
+                  className={index === 0 ? "bg-clip-text text-black" : ""}
+                  whileHover={{
+                    scale: 1.05,
+                    color: "#3b82f6",
+                    transition: { duration: 0.2 },
+                  }}
+                >
+                  {word}{" "}
+                </motion.span>
+              ))}
+            </motion.h1>
+
+            <motion.p
+              className="text-xl text-gray-600 max-w-2xl mx-auto md:mx-0 leading-relaxed"
+              variants={itemVariants}
+              whileHover={{
+                scale: 1.02,
+                transition: { duration: 0.2 },
+              }}
+            >
+              Discover the cutting-edge capabilities that make our platform the
+              perfect choice for modern businesses. Built for scale, security,
+              and intelligence.
+            </motion.p>
+          </motion.div>
+
+          {/* Right Content - Fixed 3D Model */}
+          <motion.div
+            className="lg:pl-12 flex justify-center"
+            variants={itemVariants}
+          >
+            <div className="relative w-[350px] h-[350px] mx-auto">
+              {/* Background glow with border blur */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100/20 via-white/10 to-purple-100/20 rounded-full blur-3xl scale-110" />
+              <div className="absolute inset-0 border-4 border-blue-200/30 rounded-full blur-sm" />
+              
+              {/* Spline 3D Scene (Circular Container) */}
+              {/* <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: isSplineLoaded ? 1 : 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="relative w-full h-full rounded-full overflow-hidden"
+              >
+                {!isSplineLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100/50 rounded-full">
+                    <div className="animate-pulse text-gray-500">
+                      Loading 3D model...
+                    </div>
+                  </div>
+                )}
+                <Spline
+                  scene="/models/small-robot.splinecode"
+                  className="w-full h-full"
+                  style={{
+                    background: "transparent",
+                    opacity: isSplineLoaded ? 1 : 0,
+                    transition: "opacity 0.5s ease-in-out",
+                    borderRadius: "50%", // Force circular clipping
+                  }}
+                  onLoad={() => setIsSplineLoaded(true)}
+                  onError={(error) => {
+                    console.error("Spline error:", error);
+                    setIsSplineLoaded(false);
+                  }}
+                />
+              </motion.div>
+               */}
+              {/* Decorative Elements */}
+              <motion.div
+                className="absolute -bottom-6 -right-6 w-32 h-32 bg-gradient-to-br from-blue-200/40 to-purple-300/40 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  rotate: [0, 180, 360],
+                }}
+                transition={{
+                  duration: 12,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+              <motion.div
+                className="absolute top-16 right-16 w-16 h-16 bg-gradient-to-br from-pink-200/30 to-blue-200/30 rounded-full blur-xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              />
+            </div>
+          </motion.div>
         </div>
 
-        {/* Powerful Features Section */}
+        {/* Enhanced Philosophy Cards */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          className="text-center mb-12"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.2,
+              },
+            },
+          }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Powerful Features
-          </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Our products are guaranteed to help in increasing productivity regardless of the domain
-          </p>
+          {[
+            {
+              icon: Zap,
+              title: "Simplicity",
+              description:
+                "All our products are designed to be simple and easy to use.",
+            },
+            {
+              icon: Shield,
+              title: "Security",
+              description:
+                "We want our users to be the only ones seeing their data.",
+            },
+            {
+              icon: Zap,
+              title: "Speed",
+              description:
+                "Nobody likes to see the buffering animation on their screen.",
+            },
+            {
+              icon: Zap,
+              title: "Powerful Features",
+              description:
+                "Our products are guaranteed to help in increasing productivity regardless of the domain",
+            },
+          ].map((feature, index) => (
+            <FeatureCard
+              key={feature.title}
+              feature={feature}
+              index={index}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl h-full"
+            />
+          ))}
         </motion.div>
 
-        {/* Features Bento Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 1 }}
-            className="lg:col-span-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 hover:bg-white transition-all duration-300 shadow-sm"
+        {/* Enhanced Features Section */}
+        <motion.div
+          className="text-center mb-12"
+          variants={itemVariants}
+          whileInView={{ scale: [0.9, 1] }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          {/* <motion.h2 
+            className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+            whileHover={{
+              scale: 1.05,
+              transition: { duration: 0.2 }
+            }}
           >
-            <div className="flex items-center mb-4">
-              <Lock className="w-8 h-8 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">Data Encryption</h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              End-to-end encryption ensures your information remains private and secure at all times.
-            </p>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-blue-700">256-bit AES encryption active</span>
-              </div>
-            </div>
-          </motion.div>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+              Powerful Features
+            </span>
+          </motion.h2> */}
+          {/* <motion.p 
+            className="text-lg text-gray-600 max-w-3xl mx-auto"
+            whileHover={{
+              scale: 1.02,
+              transition: { duration: 0.2 }
+            }}
+          >
+            Our products are guaranteed to help in increasing productivity
+            regardless of the domain
+          </motion.p> */}
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:bg-white transition-all duration-300 shadow-sm"
-          >
-            <Brain className="w-8 h-8 text-blue-600 mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-3">AI Integration</h3>
-            <p className="text-gray-600 text-sm">
-              Smart algorithms work behind the scenes to optimize your experience and deliver intelligent insights.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-            className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-6 hover:bg-white transition-all duration-300 shadow-sm"
-          >
-            <BarChart3 className="w-8 h-8 text-blue-600 mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-3">Real-time Analytics</h3>
-            <p className="text-gray-600 text-sm">
-              Get instant access to comprehensive data visualizations and performance metrics.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 1.6 }}
-            className="lg:col-span-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-8 hover:bg-white transition-all duration-300 shadow-sm"
-          >
-            <div className="flex items-center mb-4">
-              <HeadphonesIcon className="w-8 h-8 text-blue-600 mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">24/7 Support</h3>
-            </div>
-            <p className="text-gray-600 mb-6">
-              Our dedicated team is always available to assist you with any questions or issues.
-            </p>
-            <div className="flex items-center space-x-4">
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white"></div>
-                <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white"></div>
-                <div className="w-8 h-8 bg-purple-500 rounded-full border-2 border-white"></div>
-              </div>
-              <span className="text-sm text-blue-700">12 agents online now</span>
-            </div>
-          </motion.div>
-        </div>
-      </div>
+        {/* Enhanced Feature Cards Grid */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: {
+              transition: {
+                staggerChildren: 0.1,
+              },
+            },
+          }}
+        >
+          {[
+            {
+              icon: Lock,
+              title: "Data Encryption",
+              description:
+                "End-to-end encryption ensures your information remains private and secure at all times.",
+            },
+            {
+              icon: Brain,
+              title: "AI Integration",
+              description:
+                "Smart algorithms work behind the scenes to optimize your experience and deliver intelligent insights.",
+            },
+            {
+              icon: PlayIcon,
+              title: "Real-Time Analytics",
+              description:
+                "Get instant access to comprehensive data visualizations and performance metrics.",
+            },
+            {
+              icon: HeadphonesIcon,
+              title: "24/7 Support",
+              description:
+                "Our dedicated team is always available to assist you with any questions or issues.",
+            },
+          ].map((feature, index) => (
+            <FeatureCard
+              key={feature.title}
+              feature={feature}
+              index={index}
+              className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-lg hover:shadow-xl h-full"
+            />
+          ))}
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

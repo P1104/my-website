@@ -1,13 +1,16 @@
-import { ProductSecOne } from "./product-sec-one/product-sec-one";
-// import { ProductSecThree } from "./product-sec-three/product-sec-three";
+import { HeroSectionThemeWrapper } from "../home/hero-section-theme-wrapper/HeroSectionThemeWrapper";
+// import { ProductSecOne } from "./product-sec-one/product-sec-one";
+
 import { ProductSecTwo } from "./product-sec-two/product-sec-two";
 
 export function ProductPage() {
   return (
-    <div>
-      <ProductSecOne />
-      <ProductSecTwo />
-      {/* <ProductSecThree /> */}
-    </div>
+    <HeroSectionThemeWrapper>
+      <div className="relative z-10">
+        {/* <ProductSecOne /> */}
+        <ProductSecTwo />
+        {/* <ProductSecThree /> */}
+      </div>
+    </HeroSectionThemeWrapper>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Sparkles } from "@/components/ui/sparkles";
 
 const StarsBackground: React.FC<{ className?: string }> = ({ className = "" }) => {
@@ -16,11 +16,10 @@ const StarsBackground: React.FC<{ className?: string }> = ({ className = "" }) =
 
   return (
     <div className={`absolute inset-0 overflow-hidden ${className}`}>
-      
       {stars.map((star) => (
         <motion.div
           key={star.id}
-          className="absolute bg-white rounded-full"
+          className="absolute rounded-full"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
@@ -45,19 +44,7 @@ const StarsBackground: React.FC<{ className?: string }> = ({ className = "" }) =
 };
 
 export const CarrerSecOne = () => {
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.23, 0.86, 0.39, 0.96],
-      },
-    },
-  };
-
-  const floatingAnimation = {
+  const floatingAnimation: Variants = {
     hidden: { y: 0 },
     visible: {
       y: [0, -15, 0],
@@ -70,8 +57,8 @@ export const CarrerSecOne = () => {
   };
 
   return (
-    <div className=" bg-white text-gray-900 relative overflow-hidden pt-20">
-       <Sparkles
+    <div className="text-gray-900 relative overflow-hidden pt-16">
+      <Sparkles
         background="transparent"
         minSize={0.4}
         maxSize={1.2}
@@ -80,7 +67,7 @@ export const CarrerSecOne = () => {
         speed={0.5}
       />
       <StarsBackground className="opacity-30" />
-      <section className="relative py-24 overflow-hidden px-4">
+      <section className="relative py-12 overflow-hidden px-4">
         <div className="container mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -88,32 +75,7 @@ export const CarrerSecOne = () => {
             transition={{ duration: 0.6 }}
             className="space-y-6"
           >
-            {/* <motion.div variants={fadeInUp}>
-              <motion.div
-                className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-blue-100 border border-blue-200 backdrop-blur-sm mb-6"
-                whileHover={{
-                  scale: 1.05,
-                  borderColor: "rgba(59, 130, 246, 0.4)",
-                }}
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                >
-                  <Sparkles className="h-4 w-4 text-blue-500" />
-                </motion.div>
-                <span className="text-sm font-medium text-gray-700">
-                  We&apos;re hiring
-                </span>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              </motion.div>
-            </motion.div> */}
-            
-            <motion.div variants={floatingAnimation}>
+            <motion.div variants={floatingAnimation} initial="hidden" animate="visible">
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
                 Join Our Team
               </h1>
